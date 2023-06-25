@@ -24,8 +24,6 @@ while (true)
     {
         try
         {
-
-
             Console.WriteLine("observable method Executing on the thread " + Thread.CurrentThread.ManagedThreadId);
             var places = await new YelpReview().Execute(place, limit);
             if (places.Count == 0)
@@ -51,7 +49,7 @@ while (true)
     
     IConnectableObservable<YelpPlace> connectable = Observable.Publish(source);
 
-    connectable.ObserveOn(Scheduler.CurrentThread).Subscribe(yelpPlace =>
+    var SubscriberP = connectable.ObserveOn(Scheduler.CurrentThread).Subscribe(yelpPlace =>
     {
         //Console.WriteLine("subscriber Positive Executing on the thread " + Thread.CurrentThread.ManagedThreadId);
         int positives = 0;
@@ -63,7 +61,7 @@ while (true)
         Console.WriteLine($"Za mesto {yelpPlace.PlaceName} ima pozitivnih : {positives}");
     });
 
-    connectable.ObserveOn(Scheduler.CurrentThread).Subscribe(yelpPlace =>
+    var SubscriberN = connectable.ObserveOn(Scheduler.CurrentThread).Subscribe(yelpPlace =>
     {
         //Console.WriteLine("subscriber Positive Executing on the thread " + Thread.CurrentThread.ManagedThreadId);
         int negatives = 0;
@@ -76,9 +74,9 @@ while (true)
     });
 
     connectable.Connect();
-    //connectable.Wait();
     await connectable.LastOrDefaultAsync();
-    Console.WriteLine("Await je gotov");
+    SubscriberN.Dispose();
+    SubscriberP.Dispose();
 }
 
 
