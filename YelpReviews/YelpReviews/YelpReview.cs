@@ -19,6 +19,10 @@ public class YelpReview
         var body = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri(businessUri)));
         var json = JObject.Parse(await body.Content.ReadAsStringAsync());
         var businesses = json["businesses"];
+        if(businesses == null)
+        {
+            return new List<YelpPlace>();
+        }
         foreach (var business in businesses)
         {
             string id = business["id"].ToString();
